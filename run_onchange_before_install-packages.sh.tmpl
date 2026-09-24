@@ -7,11 +7,15 @@ set -euo pipefail
 {{   $p := index .packages $distro -}}
 {{   $list := $p.common -}}
 {{   if .gui }}{{ $list = concat $list $p.gui }}{{ end -}}
+
 {{   if eq $distro "arch" -}}
 sudo pacman -S --needed --noconfirm {{ $list | join " " }}
+
 {{   else if eq $distro "fedora" -}}
 sudo dnf install -y {{ $list | join " " }}
+
 {{   else if or (eq $distro "debian") (eq $distro "ubuntu") -}}
 sudo apt-get install -y {{ $list | join " " }}
+
 {{   end -}}
 {{ end -}}
