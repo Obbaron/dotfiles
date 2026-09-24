@@ -2,10 +2,10 @@ packages:
   arch:
     common: [bash-completion, starship, tmux, vim, neovim, lazygit,
              fzf, tree, which, tar, 7zip, unzip, zip, curl, ufw,
-             python, uv, just, wakeonlan]
+             python, uv, just, wakeonlan, less]
     gui: [hyprland, kitty]
   fedora:
     common: [bash-completion, starship, tmux, vim, neovim,
              fzf, tree, which, tar, p7zip, p7zip-plugins, unzip, zip, curl, ufw,
-             python3, uv, just, wakeonlan]
+             python3, uv, just, wakeonlan, less]
     gui: [hyprland, kitty]

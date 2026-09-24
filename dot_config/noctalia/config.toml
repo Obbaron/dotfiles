@@ -91,6 +91,14 @@ compact = true
     global  = false
     exec    = "xdg-open \"$(printf '%s' '{selection}' | cut -f2)\""
 
+    [shell.launcher.dmenu.entry.config]
+    command = "$HOME/.local/bin/cfg-menu --categories"
+    exec = "$HOME/.local/bin/cfg-menu {selection}"
+    label = "Configs"
+    prefix = ","
+    glyph = "settings"
+    global = false
+
 [[shell.session.actions]]
 action = "lock"
 countdown_seconds = 0.0

@@ -13,6 +13,7 @@ README.md
 .local/bin/hypr-env
 .local/bin/throw
 .local/lib/throw
+.local/bin/cfg-menu
 .config/systemd/user/keepalive.timer
 .config/systemd/user/keepalive.service
 .config/systemd/user/throw.service

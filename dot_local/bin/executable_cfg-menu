@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# cfg-menu: two-level config picker using Noctalia's launcher
+#   cfg-menu               pick a category, then a file
+#   cfg-menu <category>    jump straight to that category's files
+#   cfg-menu --categories  print the category list
+set -euo pipefail
+export EDITOR=${EDITOR:-nvim}
+src=$(chezmoi source-path)
+
+category() {
+  local p=$1 c
+  case $p in
+    .config/*)    c=${p#.config/}; c=${c%%/*} ;;
+    .local/lib/*) c=${p#.local/lib/}; c=${c%%/*} ;;
+    .local/bin/*) c=scripts ;;
+    *)            c=${p%%/*} ;;
+  esac
+  c=${c#.}; c=${c%%.*}
+  case $c in bash*) c=bash ;; esac
+  printf '%s\n' "$c"
+}
+
+managed() { chezmoi managed --include=files; }
+
+categories() {
+  { managed | while read -r p; do category "$p"; done; echo chezmoi; } | sort -u
+}
+
+pick() {  # skips the menu when there's only one option
+  local items
+  items=$(cat)
+  if [[ $(wc -l <<< "$items") -eq 1 ]]; then printf '%s\n' "$items"
+  else noctalia dmenu -p "$1" <<< "$items"; fi
+}
+
+if [[ ${1:-} == --categories ]]; then categories; exit 0; fi
+
+choice=${1:-}
+[[ -n $choice ]] || choice=$(categories | pick "Config") || exit 0
+
+if [[ $choice == chezmoi ]]; then
+  f=$(cd "$src" && ls -A | grep -E '^(\.chezmoi|run_)' | pick "chezmoi") || exit 0
+  exec kitty -e "$EDITOR" "$src/$f"
+fi
+
+f=$(managed | while read -r p; do
+      if [[ $(category "$p") == "$choice" ]]; then printf '%s\n' "$p"; fi
+    done | pick "$choice") || exit 0
+exec kitty -e chezmoi edit --apply "$HOME/$f"
