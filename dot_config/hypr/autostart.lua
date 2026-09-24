@@ -5,5 +5,5 @@ hl.on("hyprland.start", function()
   -- polkit agent starts asynchronously just after UI
   hl.exec_cmd("noctalia --daemon")
   hl.exec_cmd("/usr/bin/kdeconnectd")
-  hl.exec_cmd("vicinae server")
+  --  hl.exec_cmd("vicinae server")
 end)
