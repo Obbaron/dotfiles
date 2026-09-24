@@ -144,6 +144,25 @@ y() {
 }
 
 
+# Chezmoi config
+cfg() {
+  local src choice
+  src=$(chezmoi source-path)
+  choice=$(
+    {
+      chezmoi managed --include=files
+      (cd "$src" && ls -A | grep -E '^(\.chezmoi|run_)' | sed 's/^/@/')
+    } | fzf --prompt='config> ' --query="$*" --select-1 \
+            --preview "f={}; if [[ \$f == @* ]]; then cat '$src'/\${f#@}; else cat ~/\$f; fi"
+  ) || return
+  if [[ $choice == @* ]]; then
+    "${EDITOR:-nvim}" "$src/${choice#@}"
+  else
+    chezmoi edit --apply "$HOME/$choice"
+  fi
+}
+
+
 # Software
 detect_pkg_manager() {
     local pkg_manager="${PKG_MANAGER:-}"
