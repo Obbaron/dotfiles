@@ -1,0 +1,11 @@
+[Unit]
+Description=throw: send links to the TV
+
+[Service]
+ExecStart=%h/.local/lib/throw/throw.py
+EnvironmentFile=%h/.config/throw/throw.env
+Restart=on-failure
+KillMode=process
+
+[Install]
+WantedBy=default.target

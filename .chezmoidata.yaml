@@ -1,0 +1,7 @@
+packages:
+  arch:
+    common: [bash-completion, starship, tmux, vim, neovim, lazygit]
+    gui: [hyprland, kitty]
+  fedora:
+    common: [bash-completion, starship, tmux, vim, neovim]
+    gui: [hyprland, kitty]

@@ -1,0 +1,6 @@
+[Unit]                                                                                                                                                                                                            
+Description=Prevent soundbar sleep                                                                                                                                                                                
+                                                                                                                                                                                                                  
+[Service]                                                                                                                                                                                                         
+Type=oneshot                                                                                                                                                                                                      
+ExecStart=/usr/bin/paplay %h/Audio/keepalive.wav

@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#14223a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Optiplex">
+<title>throw</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='256' fill='%230076CE'/%3E%3Cpath d='M200 150L200 362L370 256Z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap">
+<style>
+  :root {
+    --bg: #14223a;
+    --panel: #1c2e4c;
+    --line: #2c4266;
+    --text: #f2eee6;
+    --muted: #93a6c2;
+    --accent: #0076ce;
+    --accent-ink: #ffffff;
+    --live: #4fd08f;
+    --danger: #e36a5f;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #e9eef5;
+      --panel: #ffffff;
+      --line: #cbd6e4;
+      --text: #13233b;
+      --muted: #5a6d88;
+      --live: #1f9d5c;
+      --danger: #c2453a;
+      color-scheme: light;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    padding: max(28px, env(safe-area-inset-top)) 22px max(28px, env(safe-area-inset-bottom));
+  }
+  main { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 32px; }
+
+  header { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 15px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+  .dot.live { background: var(--live); }
+  .dot.down { background: var(--danger); }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(32px, 9vw, 44px);
+    font-weight: 800;
+    font-optical-sizing: auto;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .idle #title { color: var(--muted); font-weight: 600; }
+  .signin h1 { width: 100%; }
+  .state { margin: 10px 0 0; color: var(--muted); }
+
+  /* The timeline: a thick tape you can drag. */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 32px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    --fill: 0%;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(var(--accent), var(--accent)) 0 / var(--fill) 100% no-repeat, var(--line);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px; height: 24px; margin-top: -6px;
+    border: 0; border-radius: 50%; background: var(--text);
+  }
+  input[type="range"]::-moz-range-track { height: 12px; border-radius: 6px; background: var(--line); }
+  input[type="range"]::-moz-range-progress { height: 12px; border-radius: 6px; background: var(--accent); }
+  input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--text); }
+  input[type="range"]:disabled { cursor: default; opacity: 0.35; }
+  .times {
+    display: flex; justify-content: space-between; margin-top: 4px;
+    color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums;
+  }
+
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; border-radius: 999px; }
+  button:disabled { cursor: default; opacity: 0.35; }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  button:not(:disabled):active { transform: scale(0.94); }
+
+  .transport { display: flex; align-items: center; justify-content: space-between; }
+  .round { width: 56px; height: 56px; display: grid; place-items: center; }
+  .round svg { width: 26px; height: 26px; fill: currentColor; }
+  .jump { font-weight: 600; font-size: 17px; font-variant-numeric: tabular-nums; }
+  .play { width: 88px; height: 88px; background: var(--accent); color: var(--accent-ink); }
+  .play svg { width: 36px; height: 36px; }
+
+  .volume { display: flex; align-items: center; gap: 14px; color: var(--muted); }
+  .volume svg { width: 22px; height: 22px; flex: none; fill: currentColor; }
+  .volume input[type="range"] { height: 28px; }
+  .volume input[type="range"]::-webkit-slider-runnable-track { height: 6px; }
+  .volume input[type="range"]::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -6px; }
+  .volume input[type="range"]::-moz-range-track,
+  .volume input[type="range"]::-moz-range-progress { height: 6px; }
+  .volume input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; }
+
+  form { display: flex; flex-wrap: wrap; gap: 10px; }
+  form label { width: 100%; color: var(--muted); font-size: 15px; }
+  .field {
+    flex: 1 1 100%;
+    min-width: 0;
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    color: var(--text);
+    font: inherit;
+  }
+  .pill {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    font-weight: 600;
+  }
+  .pill.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .stop { align-self: flex-start; padding: 8px 0; color: var(--muted); border-radius: 6px; }
+
+  [hidden] { display: none !important; }
+  .signin { display: none; }
+  body.locked .signin { display: flex; }
+  body.locked .player { display: none; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom));
+    transform: translate(-50%, 12px);
+    max-width: calc(100% - 44px);
+    padding: 11px 18px; border-radius: 12px;
+    background: var(--text); color: var(--bg);
+    font-weight: 600;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.18s, transform 0.18s;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+  #toast.error { background: var(--danger); color: #fff; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #toast { transition: none; }
+    button:not(:disabled):active { transform: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header><span class="dot" id="dot"></span><span id="connection">Connecting to Optiplex…</span></header>
+
+  <section class="player" id="player">
+    <div id="now">
+      <h1 id="title">Nothing playing</h1>
+      <p class="state" id="state">Throw a link from your phone, or paste one below.</p>
+    </div>
+  </section>
+
+  <section class="player">
+    <input type="range" id="timeline" min="0" max="0" step="1" value="0" aria-label="Playback position" disabled>
+    <div class="times"><span id="elapsed">0:00</span><span id="duration">0:00</span></div>
+  </section>
+
+  <section class="player transport">
+    <button class="round" data-action="/prev" aria-label="Previous in queue">
+      <svg viewBox="0 0 24 24"><path d="M6 5h2.5v14H6zM19 5v14L9 12z"/></svg>
+    </button>
+    <button class="round jump" data-action="/seek?t=-10" aria-label="Back 10 seconds">−10</button>
+    <button class="round play" id="playpause" data-action="/pause" aria-label="Pause">
+      <svg viewBox="0 0 24 24" id="playpause-icon"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+    <button class="round jump" data-action="/seek?t=%2B30" aria-label="Forward 30 seconds">+30</button>
+    <button class="round" data-action="/next" aria-label="Next in queue">
+      <svg viewBox="0 0 24 24"><path d="M15.5 5H18v14h-2.5zM5 5v14l10-7z"/></svg>
+    </button>
+  </section>
+
+  <section class="player volume" id="volume-row">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/></svg>
+    <input type="range" id="volume" min="0" max="100" step="1" value="100" aria-label="Volume">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z"/><path d="M15 8.5a5 5 0 0 1 0 7M17.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+  </section>
+
+  <form class="player" id="throw-form">
+    <label for="link">Throw a link</label>
+    <input class="field" id="link" type="text" inputmode="url" autocomplete="off" placeholder="https://youtu.be/…">
+    <button class="pill primary" type="submit" data-path="/play">Play now</button>
+    <button class="pill" type="submit" data-path="/queue">Add to queue</button>
+  </form>
+
+  <button class="player stop" id="stop" data-action="/stop">Stop and clear the queue</button>
+
+  <form class="signin" id="signin-form">
+    <h1>Sign in to the TV</h1>
+    <label for="token">Paste the token from <code>~/.config/throw/throw.env</code> on the TV. This browser will remember it.</label>
+    <input class="field" id="token" type="password" autocomplete="off">
+    <p class="state" id="signin-error" hidden>That token wasn't accepted. Check it against throw.env and try again.</p>
+    <button class="pill primary" type="submit">Sign in</button>
+  </form>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const DEVICE_NAME = 'Optiplex';
+  // Home-screen web apps on iOS don't reliably keep the sign-in cookie,
+  // so the page also remembers the token and sends it as a header.
+  const TOKEN_KEY = 'throw-token';
+
+  function storedToken() {
+    try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; }
+  }
+
+  function storeToken(token) {
+    try {
+      if (token) localStorage.setItem(TOKEN_KEY, token);
+      else localStorage.removeItem(TOKEN_KEY);
+    } catch { /* storage unavailable: fall back to the cookie */ }
+  }
+
+  function authHeaders() {
+    const token = storedToken();
+    return token ? { 'X-Throw-Token': token } : {};
+  }
+
+  function lock() {
+    // A stored token that gets rejected is stale: forget it.
+    if (storedToken()) {
+      storeToken('');
+      $('signin-error').hidden = false;
+    }
+    document.body.classList.add('locked');
+    setConnection('Not signed in', 'down');
+  }
+  const PLAY_ICON = '<path d="M7 4.5v15L19.5 12z"/>';
+  const PAUSE_ICON = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+  const MESSAGES = {
+    'playing': 'Playing',
+    'queued': 'Added to queue',
+    'opened in browser': 'Opened in the browser on the TV',
+  };
+  const needsMedia = document.querySelectorAll('[data-action]:not([data-action="/stop"]), #timeline');
+
+  let dragging = false;
+  let pollTimer = null;
+  let toastTimer = null;
+
+  function toast(message, isError = false) {
+    const el = $('toast');
+    el.textContent = message.charAt(0).toUpperCase() + message.slice(1);
+    el.classList.toggle('error', isError);
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  }
+
+  function formatTime(seconds) {
+    if (seconds == null || !isFinite(seconds)) return '0:00';
+    const s = Math.floor(seconds);
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = String(s % 60).padStart(2, '0');
+    return h ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`;
+  }
+
+  function setFill(range) {
+    const max = Number(range.max) || 0;
+    const percent = max ? (Number(range.value) / max) * 100 : 0;
+    range.style.setProperty('--fill', percent + '%');
+  }
+
+  function setConnection(text, state) {
+    $('connection').textContent = text;
+    $('dot').className = 'dot' + (state ? ' ' + state : '');
+  }
+
+  const PLAYER_NAMES = { mpv: 'mpv', firefox: 'Firefox' };
+
+  function render(status) {
+    const hasMedia = Boolean(status && status.player);
+    document.body.classList.toggle('idle', !hasMedia);
+    needsMedia.forEach((el) => { el.disabled = !hasMedia; });
+    // Volume, the queue and Stop only exist for mpv.
+    $('volume-row').hidden = hasMedia && !status['can-volume'];
+    $('stop').hidden = hasMedia && status.player !== 'mpv';
+
+    if (!hasMedia) {
+      $('title').textContent = 'Nothing playing';
+      $('state').textContent = 'Throw a link from your phone, or paste one below.';
+      $('timeline').max = 0;
+      $('timeline').value = 0;
+      setFill($('timeline'));
+      $('elapsed').textContent = $('duration').textContent = '0:00';
+      return;
+    }
+
+    $('title').textContent = status['media-title'] || 'Loading…';
+    const count = status['can-queue'] ? status['playlist-count'] || 0 : 0;
+    const queue = count > 1 ? `, ${status['playlist-pos'] + 1} of ${count} in the queue` : '';
+    const where = ` in ${PLAYER_NAMES[status.player] || status.player}`;
+    $('state').textContent = (status.pause ? 'Paused' : 'Playing') + where + queue;
+
+    $('playpause-icon').innerHTML = status.pause ? PLAY_ICON : PAUSE_ICON;
+    $('playpause').setAttribute('aria-label', status.pause ? 'Play' : 'Pause');
+
+    const timeline = $('timeline');
+    timeline.max = Math.max(0, Math.floor(status.duration || 0));
+    // Some sites don't report a duration to Firefox: nothing to seek along.
+    timeline.disabled = !status.duration;
+    if (!dragging) {
+      timeline.value = Math.floor(status['time-pos'] || 0);
+      $('elapsed').textContent = formatTime(status['time-pos']);
+    }
+    $('duration').textContent = formatTime(status.duration);
+    setFill(timeline);
+
+    const volume = $('volume');
+    if (document.activeElement !== volume && status.volume != null) {
+      volume.value = Math.min(100, Math.round(status.volume));
+      setFill(volume);
+    }
+  }
+
+  async function refresh() {
+    let response;
+    try {
+      response = await fetch('/status', { cache: 'no-store', headers: authHeaders() });
+    } catch {
+      setConnection(`Can't reach ${DEVICE_NAME}. Is it on?`, 'down');
+      return render(null);
+    }
+    if (response.status === 403) {
+      lock();
+      return;
+    }
+    document.body.classList.remove('locked');
+    const status = await response.json();
+    setConnection(`Connected to ${DEVICE_NAME}`, 'live');
+    render(status);
+  }
+
+  async function send(path, options = {}) {
+    try {
+      const headers = { ...authHeaders(), ...(options.headers || {}) };
+      const response = await fetch(path, { method: 'POST', ...options, headers });
+      const text = (await response.text()).trim();
+      if (response.status === 403) {
+        lock();
+      } else if (!response.ok) {
+        toast(text || `Error ${response.status}`, true);
+      } else if (MESSAGES[text]) {
+        toast(MESSAGES[text]);
+      }
+      return response.ok;
+    } catch {
+      toast("Can't reach the TV", true);
+      return false;
+    } finally {
+      refresh();
+    }
+  }
+
+  document.querySelectorAll('[data-action]').forEach((button) => {
+    button.addEventListener('click', () => send(button.dataset.action));
+  });
+
+  const timeline = $('timeline');
+  timeline.addEventListener('input', () => {
+    dragging = true;
+    $('elapsed').textContent = formatTime(Number(timeline.value));
+    setFill(timeline);
+  });
+  timeline.addEventListener('change', async () => {
+    await send('/seek?to=' + timeline.value);
+    dragging = false;
+  });
+
+  const volume = $('volume');
+  volume.addEventListener('input', () => setFill(volume));
+  volume.addEventListener('change', () => send('/volume?v=' + volume.value));
+
+  $('throw-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const link = $('link').value.trim();
+    if (!link) return toast('Paste a link first', true);
+    const path = event.submitter ? event.submitter.dataset.path : '/play';
+    const ok = await send(path, { body: link, headers: { 'Content-Type': 'text/plain' } });
+    if (ok) $('link').value = '';
+  });
+
+  $('signin-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const token = $('token').value.trim();
+    if (!token) return;
+    storeToken(token);
+    $('token').value = '';
+    $('signin-error').hidden = true;
+    refresh();
+  });
+
+  // Arrived from a throw link: show what happened, then tidy the address bar.
+  const message = new URLSearchParams(location.search).get('msg');
+  if (message) toast(MESSAGES[message] || message);
+  if (location.search) history.replaceState(null, '', '/remote');
+
+  function startPolling() {
+    clearInterval(pollTimer);
+    if (document.hidden) return;
+    refresh();
+    pollTimer = setInterval(refresh, 1000);
+  }
+  document.addEventListener('visibilitychange', startPolling);
+  startPolling();
+</script>
+</body>
+</html>
+

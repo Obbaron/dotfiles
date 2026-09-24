@@ -1,7 +1,20 @@
 README.md
 
+.config/throw/throw.env
+**/__pycache__
+
 {{ if not .gui }}
 .config/hypr
 .config/kitty
 .config/noctalia
+{{ end }}
+
+{{ if ne .chezmoi.hostname "optiplex" }}
+.local/bin/hypr-env
+.local/bin/throw
+.local/lib/throw
+.config/systemd/user/keepalive.timer
+.config/systemd/user/keepalive.service
+.config/systemd/user/throw.service
+Audio/keepalive.wav
 {{ end }}

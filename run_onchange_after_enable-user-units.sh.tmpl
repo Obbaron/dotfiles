@@ -1,0 +1,9 @@
+{{ if eq .chezmoi.hostname "optiplex" -}}
+#!/usr/bin/env bash
+# keepalive: {{ include "dot_config/systemd/user/keepalive.timer" | sha256sum }} {{ include "dot_config/systemd/user/keepalive.service" | sha256sum }}
+# throw: {{ include "dot_config/systemd/user/throw.service" | sha256sum }} {{ include "dot_local/lib/throw/executable_throw.py" | sha256sum }}
+systemctl --user daemon-reload
+systemctl --user enable --now keepalive.timer
+systemctl --user enable throw.service
+systemctl --user restart throw.service
+{{ end -}}
