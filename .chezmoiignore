@@ -1,0 +1,7 @@
+README.md
+
+{{ if not .gui }}
+.config/hypr
+.config/kitty
+.config/noctalia
+{{ end }}

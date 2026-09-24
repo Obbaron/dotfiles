@@ -1,0 +1,4 @@
+{{- $type := promptChoiceOnce . "type" "Machine type" (list "desktop" "laptop" "server") -}}
+[data]
+  type = {{ $type | quote }}
+  gui = {{ ne $type "server" }}

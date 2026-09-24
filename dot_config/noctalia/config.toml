@@ -1,0 +1,171 @@
+config_version = 14
+
+[accessibility]
+ui_scale = 1.6500000171363354
+
+[audio]
+enable_sounds = true
+
+[bar.default]
+capsule = true
+center = [ "clock", "weather" ]
+contact_shadow = true
+end = [ "tray", "notifications", "network", "bluetooth", "volume", "session" ]
+font_weight = 700
+margin_ends = 0
+scale = 1.5000000149011612
+start = [ "workspaces", "media" ]
+
+    [bar.default.dead_zone.actions]
+    left = "panel-toggle control-center home"
+    right = "settings-open"
+
+[battery.device."/org/freedesktop/UPower/devices/battery_hidpp_battery_0"]
+warning_threshold = 10
+
+[dock]
+enabled = true
+launcher_icon = "search"
+launcher_position = "start"
+magnification_scale = 1.6500000096857548
+pinned = [ "thunar", "firefox", "FFPWA-01M2J7V8P19FJE0H6R6VSZCQ98" ]
+reserve_space = false
+show_dots = true
+smart_auto_hide = true
+
+[location]
+auto_locate = true
+
+[lockscreen_widgets]
+enabled = false
+schema_version = 2
+widget_order = [ "lockscreen-login-box@HDMI-A-1" ]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 898.0
+    output = "HDMI-A-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+[shell.launcher]
+categories = false
+compact = true
+
+    [shell.launcher.providers.calculator]
+    prefix = "="
+
+    [shell.launcher.providers.emoji]
+    prefix = "."
+
+    [shell.launcher.dmenu.entry.bookmarks]
+    command = "cat ~/.config/bookmarks.tsv"
+    label   = "Bookmarks"
+    prefix  = "bk"
+    glyph   = "bookmark"
+    global  = false
+    exec    = "xdg-open \"$(printf '%s' '{selection}' | cut -f2)\""
+
+[[shell.session.actions]]
+action = "lock"
+countdown_seconds = 0.0
+enabled = false
+variant = "default"
+
+[[shell.session.actions]]
+action = "logout"
+countdown_seconds = 0.0
+enabled = true
+shortcut = "1"
+variant = "default"
+
+[[shell.session.actions]]
+action = "lock_and_suspend"
+countdown_seconds = 0.0
+enabled = false
+variant = "default"
+
+[[shell.session.actions]]
+action = "reboot"
+countdown_seconds = 0.0
+enabled = true
+shortcut = "2"
+variant = "default"
+
+[[shell.session.actions]]
+action = "command"
+command = "systemctl reboot --firmware-setup"
+countdown_seconds = 0.0
+enabled = true
+glyph = "cpu"
+label = "Reboot to BIOS"
+shortcut = "3"
+variant = "default"
+
+[[shell.session.actions]]
+action = "shutdown"
+countdown_seconds = 0.0
+enabled = true
+shortcut = "4"
+variant = "destructive"
+
+[theme]
+builtin = "Noctalia"
+mode = "dark"
+source = "wallpaper"
+wallpaper_scheme = "m3-fruit-salad"
+
+    [theme.templates]
+    builtin_ids = [ "alacritty", "btop", "gtk3", "gtk4", "hyprland", "kitty", "qt", "starship" ]
+    community_ids = [ "fastfetch", "lazygit", "tmux" ]
+
+[wallpaper]
+directory = "~/Pictures/wallpaper"
+directory_dark = "~/Pictures/wallpaper"
+directory_light = "~/Pictures/wallpaper"
+
+    [wallpaper.default]
+    path = "/home/bnb/Pictures/wallpaper/minimal-purple-tree.png"
+
+    [wallpaper.last]
+    path = "/home/bnb/Pictures/wallpaper/minimal-purple-tree.png"
+
+    [wallpaper.monitors.HDMI-A-1]
+    path = "/home/bnb/Pictures/wallpaper/minimal-purple-tree.png"
+
+[widget.media]
+hide_when_no_media = true
+
+[widget.network]
+show_label = false
+
+[widget.volume]
+show_label = false
+
+[widget.weather]
+show_condition = false
