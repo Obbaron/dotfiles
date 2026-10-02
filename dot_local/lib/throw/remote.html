@@ -75,6 +75,34 @@
   .signin h1 { width: 100%; }
   .state { margin: 10px 0 0; color: var(--muted); }
 
+  .queue { margin-top: 14px; }
+  .queue summary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px 6px 10px; border-radius: 999px;
+    background: var(--panel); border: 1px solid var(--line);
+    color: var(--text); font-weight: 600; font-size: 15px;
+    cursor: pointer; list-style: none;
+  }
+  .queue summary::-webkit-details-marker { display: none; }
+  .queue summary::before {
+    content: ""; width: 7px; height: 7px; margin: 0 2px 0 4px;
+    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg); transition: transform 0.15s;
+  }
+  .queue[open] summary::before { transform: rotate(45deg); }
+  .queue ol { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+  .queue li { display: grid; grid-template-columns: 22px 80px 1fr; gap: 10px; align-items: center; }
+  .queue .position { color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+  .queue img, .queue .no-thumb {
+    width: 80px; height: 45px; border-radius: 6px; object-fit: cover; background: var(--line);
+  }
+  .queue .title {
+    font-weight: 600; line-height: 1.25;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .queue .channel { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  @media (prefers-reduced-motion: reduce) { .queue summary::before { transition: none; } }
+
   /* The timeline: a thick tape you can drag. */
   input[type="range"] {
     -webkit-appearance: none;
@@ -181,6 +209,10 @@
     <div id="now">
       <h1 id="title">Nothing playing</h1>
       <p class="state" id="state">Throw a link from your phone, or paste one below.</p>
+      <details class="queue" id="queue" hidden>
+        <summary id="queue-count">1 more in the queue</summary>
+        <ol id="queue-list"></ol>
+      </details>
     </div>
   </section>
 
@@ -265,11 +297,18 @@
   const MESSAGES = {
     'playing': 'Playing',
     'queued': 'Added to queue',
-    'opened in browser': 'Opened in the browser on the TV',
+    'opened in browser': 'Not a YouTube link, so it opened in a new window',
   };
   const needsMedia = document.querySelectorAll('[data-action]:not([data-action="/stop"]), #timeline');
 
   let dragging = false;
+  // After a seek, Firefox briefly still reports the old position. Hold the
+  // slider where it was dropped until the player catches up (or give up
+  // after a few seconds, so a seek that really failed still snaps back).
+  const SEEK_HOLD_MS = 3000;
+  const SEEK_ARRIVED_SECONDS = 3;
+  let seekTarget = null;
+  let seekUntil = 0;
   let pollTimer = null;
   let toastTimer = null;
 
@@ -302,17 +341,59 @@
     $('dot').className = 'dot' + (state ? ' ' + state : '');
   }
 
-  const PLAYER_NAMES = { mpv: 'mpv', firefox: 'Firefox' };
+
+  // Rebuilt only when the queue changes, so the list doesn't flicker and
+  // stays open or closed as the viewer left it.
+  let shownQueue = '';
+
+  function renderQueue(items) {
+    const box = $('queue');
+    box.hidden = items.length === 0;
+    const key = JSON.stringify(items);
+    if (key === shownQueue) return;
+    shownQueue = key;
+    $('queue-count').textContent = `${items.length} more in the queue`;
+    $('queue-list').replaceChildren(...items.map((item, index) => {
+      const row = document.createElement('li');
+      const position = document.createElement('span');
+      position.className = 'position';
+      position.textContent = index + 1;
+      let picture;
+      if (item.thumbnail) {
+        picture = document.createElement('img');
+        picture.src = item.thumbnail;
+        picture.alt = '';
+        picture.loading = 'lazy';
+      } else {
+        picture = document.createElement('span');
+        picture.className = 'no-thumb';
+      }
+      const text = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = item.title;
+      text.append(title);
+      if (item.channel) {
+        const channel = document.createElement('div');
+        channel.className = 'channel';
+        channel.textContent = item.channel;
+        text.append(channel);
+      }
+      row.append(position, picture, text);
+      return row;
+    }));
+  }
 
   function render(status) {
     const hasMedia = Boolean(status && status.player);
     document.body.classList.toggle('idle', !hasMedia);
     needsMedia.forEach((el) => { el.disabled = !hasMedia; });
-    // Volume, the queue and Stop only exist for mpv.
+    // Volume, the queue and Stop belong to the TV, not other Firefox media.
     $('volume-row').hidden = hasMedia && !status['can-volume'];
-    $('stop').hidden = hasMedia && status.player !== 'mpv';
+    $('stop').hidden = hasMedia && status.player !== 'tv';
 
     if (!hasMedia) {
+      renderQueue([]);
       $('title').textContent = 'Nothing playing';
       $('state').textContent = 'Throw a link from your phone, or paste one below.';
       $('timeline').max = 0;
@@ -323,10 +404,9 @@
     }
 
     $('title').textContent = status['media-title'] || 'Loading…';
-    const count = status['can-queue'] ? status['playlist-count'] || 0 : 0;
-    const queue = count > 1 ? `, ${status['playlist-pos'] + 1} of ${count} in the queue` : '';
-    const where = ` in ${PLAYER_NAMES[status.player] || status.player}`;
-    $('state').textContent = (status.pause ? 'Paused' : 'Playing') + where + queue;
+    const where = status.player === 'firefox' ? ' in Firefox' : '';
+    $('state').textContent = (status.pause ? 'Paused' : 'Playing') + where;
+    renderQueue(status.queue || []);
 
     $('playpause-icon').innerHTML = status.pause ? PLAY_ICON : PAUSE_ICON;
     $('playpause').setAttribute('aria-label', status.pause ? 'Play' : 'Pause');
@@ -336,8 +416,14 @@
     // Some sites don't report a duration to Firefox: nothing to seek along.
     timeline.disabled = !status.duration;
     if (!dragging) {
-      timeline.value = Math.floor(status['time-pos'] || 0);
-      $('elapsed').textContent = formatTime(status['time-pos']);
+      let shown = status['time-pos'] || 0;
+      if (seekTarget !== null) {
+        const arrived = Math.abs(shown - seekTarget) < SEEK_ARRIVED_SECONDS;
+        if (arrived || Date.now() > seekUntil) seekTarget = null;
+        else shown = seekTarget;
+      }
+      timeline.value = Math.floor(shown);
+      $('elapsed').textContent = formatTime(shown);
     }
     $('duration').textContent = formatTime(status.duration);
     setFill(timeline);
@@ -399,6 +485,8 @@
     setFill(timeline);
   });
   timeline.addEventListener('change', async () => {
+    seekTarget = Number(timeline.value);
+    seekUntil = Date.now() + SEEK_HOLD_MS;
     await send('/seek?to=' + timeline.value);
     dragging = false;
   });
@@ -442,4 +530,3 @@
 </script>
 </body>
 </html>
-
