@@ -31,5 +31,5 @@ if [ ${#args[@]} -eq 0 ]; then
   exit 0
 fi
 
-err=$(tmux display-menu -c "$client" -T " Keys " -x R -y B -- "${args[@]}" 2>&1) \
+err=$(tmux display-menu -c "$client" -T " Keys " -x R -y S -- "${args[@]}" 2>&1) \
   || tmux display-message -c "$client" "which-key: ${err:-display-menu failed}"
