@@ -130,7 +130,7 @@ printf -v BLANK '%*s' "$BW" ''
 
 out=()
 out+=("")
-out+=("  ${C_HEAD}Keybinds${RESET}   ${C_DIM}prefix is ${pfx}. Keys need the prefix unless marked.${RESET}")
+out+=("  ${C_HEAD}Keybinds${RESET}   ${C_DIM}prefix is ${pfx}. j/k to scroll, q to close${RESET}")
 out+=("")
 for ((r = 0; r < maxh; r++)); do
   line="  "
