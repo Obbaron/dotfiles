@@ -23,6 +23,7 @@ alias df='df -h'
 alias du='du -h'
 alias free='free -h'
 alias lg='lazygit'
+alias cm='chezmoi'
 
 if command -v eza >/dev/null 2>&1; then
   alias ls="eza -al --color=always --group-directories-first --icons"
