@@ -49,8 +49,7 @@ row "/"         "Split right"
 row "-"         "Split below"
 row "m"         "Zoom pane"
 row "x"         "Kill pane"
-row "Arrows"    "Resize pane (repeats)"
-row "o"         "Next pane"
+row "Arrows"    "Resize pane"
 row "q"         "Show pane numbers"
 row "{  }"      "Swap pane up / down"
 row "!"         "Break pane to window"
@@ -59,6 +58,7 @@ sec "Windows"
 row "Tab"       "Last window"
 row "S-Tab"     "New window"
 row "1 - 9"     "Go to window"
+row "(  )"      "Previous / next window"
 row ","         "Rename window"
 row "&"         "Kill window"
 row "w"         "Window / session tree"
@@ -69,7 +69,6 @@ row "n"         "New session"
 row "o"         "Switch session (fzf)"
 row "s"         "Session tree"
 row "\$"        "Rename session"
-row "(  )"      "Previous / next session"
 row "L"         "Last session"
 row "d"         "Detach"
 
@@ -96,7 +95,7 @@ row "]"         "Paste buffer"
 
 sec "Mouse"
 row "Click"     "Focus pane / window tab"
-row "Drag"      "Select text / resize border"
+row "Drag"      "Select text / resize pane"
 row "Scroll"    "Enter copy mode and scroll"
 flush
 ### === end of content == ###
@@ -128,7 +127,7 @@ printf -v BLANK '%*s' "$BW" ''
 
 out=()
 out+=("")
-out+=("  ${C_HEAD}Keybinds${RESET}   ${C_DIM}prefix is ${pfx}. j/k to scroll, q to close${RESET}")
+out+=("  ${C_HEAD}Keybinds${RESET}   ${C_DIM}prefix: ${pfx}${RESET}")
 out+=("")
 for ((r = 0; r < maxh; r++)); do
   line="  "
