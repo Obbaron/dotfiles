@@ -3,23 +3,38 @@
 client="$1"
 sep=$'\x1f'
 
-# tmux treats an argument ending in ';' as a command separator; escape it
+WIDTH="${WK_WIDTH:-36}"
+PAD="${WK_PAD:-1}"
+
+# tmux treats an argument ending in ';' as a command separator
 esc() { local s="$1"; [[ "$s" == *';' ]] && s="${s%;}\\;"; printf '%s' "$s"; }
 
+blank() { for ((i = 0; i < PAD; i++)); do args+=("- " "" ""); done; }
+
 args=()
+blank
 while IFS="$sep" read -r key note cmd; do
   [[ "$note" == wk:* ]] || continue
   note="${note#wk:}"
   [ "$key" = "Space" ] && continue
-  # Only single-character keys are used as menu shortcuts
-  if [ "${#key}" -eq 1 ]; then shortcut="$(esc "$key")"; else shortcut=""; fi
-  args+=("$(esc "$note  ($key)")" "$shortcut" "$(esc "$cmd")")
-done < <(tmux list-keys -T prefix -F "#{key_string}${sep}#{key_note}${sep}#{key_command}")
 
-if [ ${#args[@]} -eq 0 ]; then
+  if [ "${#key}" -eq 1 ]; then
+    # tmux appends "(key)" itself for shortcut items
+    shortcut="$(esc "$key")"
+    label=$(printf '  %-*s' "$WIDTH" "$note")
+  else
+    # no shortcut possible, so show the key in the label
+    shortcut=""
+    label=$(printf '  %-*s(%s)' "$WIDTH" "$note" "$key")
+  fi
+  args+=("$(esc "$label")" "$shortcut" "$(esc "$cmd")")
+done < <(tmux list-keys -T prefix -F "#{key_string}${sep}#{key_note}${sep}#{key_command}")
+blank
+
+if [ ${#args[@]} -le $((PAD * 2 * 3)) ]; then
   tmux display-message -c "$client" "which-key: no bindings with wk: notes"
   exit 0
 fi
 
-err=$(tmux display-menu -c "$client" -T " Keys " -x C -y C "${args[@]}" 2>&1) \
+err=$(tmux display-menu -c "$client" -T " Keys " -x R -y B "${args[@]}" 2>&1) \
   || tmux display-message -c "$client" "which-key: ${err:-display-menu failed}"
