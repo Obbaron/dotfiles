@@ -1,4 +1,14 @@
-{{- $type := promptChoiceOnce . "type" "Machine type" (list "desktop" "laptop" "server") -}}
+{{- $install := promptBoolOnce . "installPackages" "Install packages via the system package manager" true -}}
+{{- $type := promptChoiceOnce . "type" "Device type" (list "desktop" "laptop" "server") -}}
+{{- $gitUser := promptStringOnce . "gitUser" "Git username" -}}
+{{- $gitEmail := promptStringOnce . "gitEmail" "Git email" -}}
+
 [data]
+  installPackages = {{ $install }}
   type = {{ $type | quote }}
   gui = {{ ne $type "server" }}
+  gitUser = {{ $gitUser | quote }}
+  gitEmail = {{ $gitEmail | quote }}
+
+[git]
+  commitMessageTemplate = '{{ "{{" }} promptString "Commit message" {{ "}}" }}'
