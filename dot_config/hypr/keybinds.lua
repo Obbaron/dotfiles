@@ -72,10 +72,13 @@ hl.bind("XF86AudioMute",         hl.dsp.exec_cmd(ipc .. "volume-mute"),     { lo
 hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd(ipc .. "brightness-up"),   { locked = true, repeating = true, description = "Brightness up" })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. "brightness-down"), { locked = true, repeating = true, description = "Brightness down" })
 
--- screenshot
+-- screen recording
 hl.bind("Print", hl.dsp.exec_cmd(ipc .. "screenshot-fullscreen"))
 hl.bind("SHIFT + Print", hl.dsp.exec_cmd(ipc .. "screenshot-region"))
 hl.bind(mod .. " + SHIFT + S", hl.dsp.exec_cmd(ipc .. "screenshot-annotate"))
+
+hl.bind("CTRL + Print", hl.dsp.exec_cmd("~/.local/bin/screen-record fullscreen"))
+hl.bind("SHIFT + CTRL + Print", hl.dsp.exec_cmd("~/.local/bin/screen-record region"))
 
 -- mouse binds
 hl.bind(mod .. "+mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Move window with mouse" })

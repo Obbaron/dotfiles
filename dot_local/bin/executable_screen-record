@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+DIR="$HOME/Videos/recordings"
+mkdir -p "$DIR"
+
+if pgrep -x wf-recorder > /dev/null; then
+    pkill -INT -x wf-recorder
+    exit
+fi
+
+MODE="$1"
+FILE="$DIR/$(date +%Y-%m-%d_%H-%M-%S).mp4"
+
+if [ "MODE" = "region" ]; then
+    GEOMETRY=$(slurp) || exit
+    wf-recorder -g "$GEOMETRY" -f "$FILE"
+else
+    wf-recorder -f "$FILE"
+fi
