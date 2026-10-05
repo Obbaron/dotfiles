@@ -1,29 +1,84 @@
 palette = "noctalia"
+
+# prompt layout
 add_newline = false
-# A minimal left prompt
-format = """$directory$character"""
-# move the rest of the prompt to the right
-right_format = """$all"""
+
+format = """
+$directory
+$git_branch
+$git_status
+$aws
+$kubernetes
+$golang
+$character
+"""
+
 command_timeout = 1000
 
 [character]
-vicmd_symbol = "[N] >>>"
-success_symbol = '[❯](bold green)'
+success_symbol = '[❯](bold green) '
+error_symbol = '[❯](bold red) '
+vimcmd_symbol = '[N](bold yellow) ❮ '
+
+[directory]
+style = 'bold blue'
+truncation_length = 3
+truncate_to_repo = false
+format = '$path '
 
 [directory.substitutions]
 '~/tests/starship-custom' = 'work-project'
 
 [git_branch]
 format =  '[$symbol$branch(:$remote_branch)]($style)'
+format = '$symbol$branch(:$remote_branch) '
+style = 'bold mauve'
+
+[git_status]
+format = '($all_status$ahead_behind )'
+style = 'bold red'
+conflicted = '⚔ '
+ahead = '⇡${count} '
+behind = '⇣${count} '
+diverged = '⇕⇡${ahead_count} ⇣${behind_count} '
+untracked = '?${count} '
+stashed = '󰆓${count} '
+modified = '!${count} '
+staged = '+${count} '
+renamed = '»${count} '
+deleted = '✘${count} '
+
+[python]
+format = '$symbol$virtualenv '
+symbol = ' '
+style = 'bold yellow'
+detect_extensions = ['py']
+detect_files = [
+'.python-version',
+'Pipfile',
+'pyproject.toml',
+'requirements.txt',
+'setup.py',
+]
+
+[rust]
+format = '$symbol$version '
+symbol = ' '
+style = 'bold red'
+
+[golang]
+format = '[ ](bold cyan)'
+
+[nodejs]
+format = '$symbol$version '
+symbol = ' '
+style = 'bold green'
 
 [aws]
 format = '[$symbol(profile: "$profile" )(\(region: $region\) )]($style)'
 disabled = false
 style = 'bold blue'
 symbol = " "
-
-[golang]
-format = '[ ](bold cyan)'
 
 [kubernetes]
 symbol = '☸ '
