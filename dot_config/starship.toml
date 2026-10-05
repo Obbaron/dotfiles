@@ -5,11 +5,10 @@ palette = "noctalia"
 add_newline = false
 
 format = """\
-  󰣇 \
+  $os \
   $directory\
-  $git_branch$git_commit$git_state $git_status\
-  $character\n
-"""
+  $git_branch$git_commit$git_state $git_status
+$character"""
 right_format = """
 $singularity\
 $kubernetes\
@@ -99,7 +98,7 @@ continuation_prompt = '▶▶ '
 disabled = false
 format = "[$path](bold fg:#8be9fd)"
 truncate_to_repo = false
-# home_symbol = "" 
+# home_symbol = ""
 
 [git_branch]
 format = " [  $branch](fg:#9198a1)"
@@ -111,6 +110,20 @@ diverged = '⇕⇡${ahead_count}⇣${behind_count}'
 format = '[[( $all_status$ahead_behind )](fg:#769ff0)]($style)'
 style = "bg:#394260"
 
+[os]
+disabled = false
+
+[os.symbols]
+Arch = "󰣇 "
+Ubuntu = "󰕈 "
+Debian = " "
+Fedora = " "
+Manjaro = " "
+NixOS = "󱄅 "
+Macos = "󰀵 "
+Linux = "󰌽 "
+Windows = " "
+Unknown = " "
 
 [time]
 disabled = false
