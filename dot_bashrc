@@ -38,9 +38,13 @@ fi
 
 # tmux
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-  tmux attach-session -t default || tmux new-session -s default
+    tmux attach-session -t default || tmux new-session -s default
 fi
 
+# Search recent files
+if [[ $- == *i* ]]; then
+    bind '"\C-f":"zi\n"'
+fi
 
 command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init bash --cmd cd)"
 command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
