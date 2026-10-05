@@ -3,9 +3,9 @@ packages:
     common: [bash-completion, starship, tmux, neovim, lazygit, starship,
              fzf, tree, which, tar, 7zip, unzip, zip, curl, ufw,
              fastfetch, python, uv, just, wakeonlan, less]
-    gui: [hyprland, kitty, wl-recorder, firefox]
+    gui: [hyprland, kitty, wf-recorder, firefox]
   fedora:
     common: [bash-completion, starship, tmux, neovim, lazygit, starship,
              fzf, tree, which, tar, p7zip, p7zip-plugins, unzip, zip, curl, firewalld,
              fastfetch, python3, uv, just, wakeonlan, less]
-    gui: [hyprland, kitty, wl-recorder, firefox]
+    gui: [hyprland, kitty, wf-recorder, firefox]
