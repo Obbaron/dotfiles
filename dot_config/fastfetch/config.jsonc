@@ -17,17 +17,9 @@
   },
   "modules": [
     "title",
-    "break",
-
-    // --- SOFTWARE ---
     {
       "type": "custom",
-      "format": "SOFTWARE",
-      "outputColor": "bold_yellow"
-    },
-    {
-      "type": "custom",
-      "format": "────────"
+      "format": "──────────────────────"
     },
     {
       "type": "os",
@@ -56,30 +48,6 @@
     {
       "type": "terminal",
       "key": "Terminal"
-    },
-    "break",
-
-    // --- HARDWARE ---
-    {
-      "type": "custom",
-      "format": "HARDWARE",
-      "outputColor": "bold_yellow"
-    },
-    {
-      "type": "custom",
-      "format": "────────"
-    },
-    {
-      "type": "host",
-      "key": "Host"
-    },
-    {
-      "type": "cpu",
-      "key": "CPU"
-    },
-    {
-      "type": "gpu",
-      "key": "GPU"
     },
     {
       "type": "memory",
