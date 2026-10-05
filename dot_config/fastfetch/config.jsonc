@@ -13,10 +13,21 @@
     "color": {
       "keys": "cyan",
       "title": "bold_magenta"
+    },
+    "key": {
+      "width": 10
     }
   },
   "modules": [
     "title",
+    "break",
+
+    // --- SOFTWARE ---
+    {
+      "type": "custom",
+      "format": "SOFTWARE",
+      "outputColor": "bold_yellow"
+    },
     {
       "type": "custom",
       "format": "──────────────────────"
@@ -48,6 +59,30 @@
     {
       "type": "terminal",
       "key": "Terminal"
+    },
+    "break",
+
+    // --- HARDWARE ---
+    {
+      "type": "custom",
+      "format": "HARDWARE",
+      "outputColor": "bold_yellow"
+    },
+    {
+      "type": "custom",
+      "format": "──────────────────────"
+    },
+    {
+      "type": "host",
+      "key": "Host"
+    },
+    {
+      "type": "cpu",
+      "key": "CPU"
+    },
+    {
+      "type": "gpu",
+      "key": "GPU"
     },
     {
       "type": "memory",
