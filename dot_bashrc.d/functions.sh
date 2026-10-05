@@ -16,6 +16,12 @@ backup () {
   cp -- "${1}" "${1}.$(date +%Y%m%d%H%M%S).bak"
 }
 
+copy() {
+	pbcopy 2>/dev/null ||
+	wl-clipboard 2>/dev/null ||
+	clip.exe
+}
+
 extract () {
   [ -f "${1}" ] || { echo "Error: file not found" >&2; return 1; }
   case "${1}" in
