@@ -1,8 +1,8 @@
 #!/bin/sh
-# bootstrap.sh
+# install.sh
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/Obbaron/dotfiles-et-al/main/bootstrap.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/Obbaron/dotfiles-et-al/main/install.sh | sh
 #
 # Config:
 #   REPO       owner/name
@@ -10,9 +10,9 @@
 #   DRY_RUN    report actions but change nothing
 #
 # Examples:
-#   ./bootstrap.sh
-#   REPO_URL=git@github.com:Obbaron/dotfiles-et-al.git ./bootstrap.sh
-#   DRY_RUN=1 ./bootstrap.sh
+#   ./install.sh
+#   REPO_URL=git@github.com:Obbaron/dotfiles-et-al.git ./install.sh
+#   DRY_RUN=1 ./install.sh
 
 set -eu
 
@@ -38,7 +38,7 @@ log() {
         reset="${ESC}[0m"
     fi
 
-    printf '[bootstrap] %s%-5s%s %s\n' \
+    printf '[install] %s%-5s%s %s\n' \
         "$color" "$lvl" "$reset" "$*" >&2
 }
 say() {
@@ -51,7 +51,7 @@ die() {
 
 run_priv() {
     if [ -n "$DRY_RUN" ]; then
-        printf '[bootstrap] + %s\n' "$*" >&2
+        printf '[install] + %s\n' "$*" >&2
         return 0
     fi
 
