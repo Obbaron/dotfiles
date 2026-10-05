@@ -1,11 +1,11 @@
 packages:
   arch:
-    common: [bash-completion, starship, tmux, vim, neovim, lazygit,
+    common: [bash-completion, starship, tmux, neovim, lazygit, starship,
              fzf, tree, which, tar, 7zip, unzip, zip, curl, ufw,
-             python, uv, just, wakeonlan, less]
-    gui: [hyprland, kitty]
+             fastfetch, python, uv, just, wakeonlan, less]
+    gui: [hyprland, kitty, wl-recorder, firefox]
   fedora:
-    common: [bash-completion, starship, tmux, vim, neovim,
-             fzf, tree, which, tar, p7zip, p7zip-plugins, unzip, zip, curl, ufw,
-             python3, uv, just, wakeonlan, less]
-    gui: [hyprland, kitty]
+    common: [bash-completion, starship, tmux, neovim, lazygit, starship,
+             fzf, tree, which, tar, p7zip, p7zip-plugins, unzip, zip, curl, firewalld,
+             fastfetch, python3, uv, just, wakeonlan, less]
+    gui: [hyprland, kitty, wl-recorder, firefox]
