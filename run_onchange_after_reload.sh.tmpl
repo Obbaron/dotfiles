@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# hyprland.conf hash:  {{ include "dot_config/hypr/hyprland.conf" | sha256sum }}
+# tmux.conf hash:      {{ include "dot_tmux.conf" | sha256sum }}
+# bashrc hash:         {{ include "dot_bashrc" | sha256sum }}
+
+echo "Reloading system configurations..."
+
+if command -v hyprctl &> /dev/null; then
+    echo "   Reloading Hyprland..."
+    hyprctl reload &> /dev/null || true
+fi
+
+if command -v tmux &> /dev/null && tmux info &> /dev/null; then
+    echo "   Reloading Tmux..."
+    tmux source-file ~/.tmux.conf
+fi
