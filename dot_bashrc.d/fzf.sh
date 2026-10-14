@@ -1,6 +1,6 @@
 # ~/.bashrc.d/fzf.sh
 
-have fzf || return 0
+_have fzf || return 0
 
 # fzf directories under the current one and cd
 f() {
