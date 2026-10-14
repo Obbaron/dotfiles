@@ -1,6 +1,6 @@
 # ~/.bashrc.d/chezmoi.sh
 
-have chezmoi || return 0
+_have chezmoi || return 0
 
 alias cm='chezmoi'
 
