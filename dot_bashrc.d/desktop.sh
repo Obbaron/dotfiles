@@ -2,14 +2,14 @@
 # desktop integration
 
 # copy: stdin -> clipboard
-if have wl-copy || have xclip || have pbcopy || have clip.exe; then
+if _have wl-copy || _have xclip || _have pbcopy || _have clip.exe; then
     copy() {
-        if   have wl-copy;  then wl-copy
-        elif have xclip;    then xclip -selection clipboard
-        elif have pbcopy;   then pbcopy
+        if   _have wl-copy;  then wl-copy
+        elif _have xclip;    then xclip -selection clipboard
+        elif _have pbcopy;   then pbcopy
         else clip.exe
         fi
     }
 fi
 
-have xdg-open && alias open='xdg-open'
+_have xdg-open && alias open='xdg-open'
