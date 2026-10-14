@@ -103,7 +103,6 @@ path() {
     echo "$PATH" | tr ":" "\n" | nl
 }
 
-# hl <pattern>: highlight matches without hiding other lines
 hl() {
     local pattern=$1
     shift
