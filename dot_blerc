@@ -1,0 +1,24 @@
+# ~/.blerc - ble.sh user settings
+#
+# Auto-loaded by ble.sh (sourced from ~/.bashrc). This file is read by ble.sh,
+# not bash, so bleopt / ble-face / ble-bind are available here.
+# Full list of options: https://github.com/akinomyoga/ble.sh/blob/master/blerc.template
+
+# --- Completion --------------------------------------------------------------
+bleopt complete_ambiguous=1        # "a.b" can match "apple.banana"
+bleopt complete_auto_delay=150     # ms before the grey autosuggestion appears
+bleopt complete_menu_style=align-nowrap   # tidy, column-aligned completion menu
+
+# --- Highlighting ------------------------------------------------------------
+bleopt color_scheme=base16         # use the terminal's base16 palette
+
+# --- Optional extras (uncomment to enable) -----------------------------------
+# Show elapsed time after commands that take a while:
+# bleopt exec_elapsed_mark=$'\e[94m[%ss]\e[m'
+# bleopt exec_elapsed_enabled='usr+sys>=10000'   # only when >10s CPU time
+
+# Hide the end-of-line marker ble.sh shows for output without a trailing newline:
+# bleopt prompt_eol_mark=''
+
+# Vim editing mode in the shell (default is emacs):
+# set -o vi
