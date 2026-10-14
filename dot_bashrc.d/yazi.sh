@@ -1,7 +1,7 @@
 # ~/.bashrc.d/yazi.sh
 # y: run yazi and cd
 
-have yazi || return 0
+_have yazi || return 0
 
 y() {
     local tmp cwd
