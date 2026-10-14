@@ -1,6 +1,6 @@
 # ~/.bashrc.d/git.sh
 
-have git || return 0
+_have git || return 0
 
 alias nb='git checkout -b "$USER-$(date +%s)"'  # new branch
 alias ga='git add . --all'
@@ -18,4 +18,4 @@ alias gs='git status'
 alias gt='git tag'
 alias gu='git pull'
 
-have lazygit && alias lg='lazygit'
+_have lazygit && alias lg='lazygit'
