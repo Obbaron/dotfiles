@@ -23,7 +23,7 @@ brc() {
     chezmoi edit --apply "$file"
 }
 
-have fzf || return 0
+_have fzf || return 0
 
 # cfg <query>: pick a managed file, edit it, apply changes
 cfg() {
