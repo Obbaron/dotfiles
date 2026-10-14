@@ -1,0 +1,271 @@
+# ~/.bashrc - bash and coreutils only
+
+# Any dependencies get their own file in ~/.bashrc.d/ (one file per tool or
+# capability) and can override anything set here.
+
+
+[[ $- != *i* ]] && return  # return if not running interactively
+
+
+### BOOTSTRAP ###
+
+# _have <cmd>: Names listed in BASHRC_SKIP are treated as missing:
+#   BASHRC_SKIP="eza starship tmux" bash -i
+_have() {
+    case " ${BASHRC_SKIP-} " in *" $1 "*) return 1 ;; esac
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+# _prompt <rc>: builds PS1. A module (e.g. starship.sh) that takes over the
+# prompt does `unset -f _prompt`, and _precmd below then leaves PS1 alone.
+_prompt() {
+    PS1='\[\e]0;\u@\h: \w\a\]'                             # terminal title
+    (( $1 )) && PS1+="\[\e[31m\]$1 \[\e[0m\]"              # last exit code if nonzero
+    if (( EUID == 0 )); then PS1+='\[\e[31m\]\u'           # red user when root
+    else PS1+='\[\e[32m\]\u'
+    fi
+    PS1+='\[\e[2;32m\]@\h\[\e[0m\]:\[\e[32m\]\w\[\e[0m\]\$ '
+}
+
+# _precmd: runs before each prompt. Appends history (shared across open shells
+# and tmux panes) and rebuilds the prompt with the exit code. ONE PROMPT_COMMAND
+# entry: two would clobber each other's $?.
+_precmd() {
+    local rc=$?
+    history -a
+    declare -F _prompt >/dev/null && _prompt "$rc"
+}
+case ";${PROMPT_COMMAND-};" in
+    *";_precmd;"*) ;;                                      # already wired
+    *) PROMPT_COMMAND="_precmd${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
+esac
+PROMPT_DIRTRIM=3            # collapse deep paths to .../last/three
+
+
+### ENVIRONMENT ###
+
+export LANG="en_GB.UTF-8"
+export TZ="Europe/London"
+
+export EDITOR="vi"  # ~/.bashrc.d/editor.sh upgrades this
+export VISUAL="$EDITOR"
+
+export GREP_COLORS='mt=1;36'
+
+# One source of file colours for ls, completion (colored-stats) and anything
+# that reads LS_COLORS. Picks up ~/.dircolors if present.
+if _have dircolors; then
+    if [ -r "$HOME/.dircolors" ]; then eval "$(dircolors -b "$HOME/.dircolors")"
+    else eval "$(dircolors -b)"
+    fi
+fi
+
+GPG_TTY=$(tty 2>/dev/null)
+export GPG_TTY
+
+prepend_path() {  # stops re-adding to PATH if sourced again
+    [ -d "$1" ] || return 0
+    case ":$PATH:" in *":$1:"*) ;; *) PATH="$1:$PATH" ;; esac
+}
+prepend_path "$HOME/bin"
+prepend_path "$HOME/.local/bin"
+unset -f prepend_path
+export PATH
+
+
+### HISTORY & SHELL ###
+
+HISTCONTROL=ignoreboth
+HISTSIZE=10000
+HISTFILESIZE=20000
+HISTTIMEFORMAT='%F %T  '                       # timestamp each history entry
+HISTIGNORE='ls:ll:la:cd:pwd:clear:c:h:q:exit'  # don't record trivial commands
+shopt -s histappend checkwinsize cdspell
+
+
+### ALIASES ###
+
+alias reload='source ~/.bashrc'
+
+_ls='ls --color=auto --group-directories-first'
+alias ls="$_ls -Al"
+alias la="$_ls -A"
+alias ll="$_ls -l"
+alias lt="$_ls -Altr"
+alias l.='command ls -A | grep "^\."'
+unset _ls
+
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='grep -F'
+alias egrep='grep -E'
+
+alias psmem='ps auxf | sort -nr -k 4'
+alias psmem10='ps auxf | sort -nr -k 4 | head -10'
+alias h='history'
+alias hg='history | grep'
+alias df='df -h'
+alias du='du -h'
+alias free='free -h'
+
+alias c='clear'
+alias q='exit'
+
+# trailing space: makes bash expand the NEXT word as an alias too, so
+# `sudo ll` and friends still resolve aliases
+alias sudo='sudo '
+
+# spelling is hard
+alias suod='sudo'
+alias chomd='chmod'
+alias gerp='grep'
+
+
+### FUNCTIONS ###
+
+# Shell config
+brc() {
+    local file="$HOME/.bashrc"
+    [ -n "$1" ] && file="$HOME/.bashrc.d/${1%.sh}.sh"
+    "${EDITOR:-vi}" "$file"
+}
+
+path() {
+    echo "$PATH" | tr ":" "\n" | nl
+}
+
+# modcheck: list every tool the modules guard with `_have`, and whether it is
+# installed. The list is read from the modules, so there's nothing to keep in
+# sync. Capability modules (clipboard, etc.) list each alternative separately.
+modcheck() {
+    local t
+    for t in $(grep -ho '\b_have [A-Za-z0-9._-]\+' "$HOME"/.bashrc.d/*.sh 2>/dev/null \
+               | cut -d' ' -f2 | sort -u); do
+        if _have "$t"; then printf '  \e[32mok     \e[0m %s\n' "$t"
+        else              printf '  \e[31mmissing\e[0m %s\n' "$t"
+        fi
+    done
+}
+
+# hl <pattern>: highlight matches without hiding other lines
+hl() {
+    local pattern=$1
+    shift
+    grep -E "$pattern|\$" "$@"
+}
+
+_need() {
+    _have "$1" || { echo "${FUNCNAME[1]}: $1 is not installed" >&2; return 1; }
+}
+
+
+# File ops
+backup() {
+    [ -z "$1" ] && { echo "Usage: backup <file>"; return 1; }
+    [ ! -e "$1" ] && { echo "Error: file not found" >&2; return 1; }
+
+    cp -- "$1" "$1.$(date +%Y%m%d%H%M%S).bak"
+}
+
+# restore <file>: copy the newest backup made by backup() over <file>.
+# The timestamp in the name is zero-padded, so the glob's last match is newest.
+restore() {
+    [ -z "$1" ] && { echo "Usage: restore <file>"; return 1; }
+    local target=$1 backups confirm
+    backups=( "$target".*.bak )
+    [ -e "${backups[0]}" ] || { echo "restore: no backups for $target" >&2; return 1; }
+    local newest=${backups[-1]}
+
+    if [ -e "$target" ]; then
+        read -r -p "Overwrite $target with ${newest##*/}? (y/N): " confirm
+        case $confirm in
+            [yY]|[yY][eE][sS]) ;;
+            *) echo "Cancelled."; return 1 ;;
+        esac
+    fi
+    cp -- "$newest" "$target" && echo "Restored $target from ${newest##*/}"
+}
+
+extract() {
+    [ -f "$1" ] || { echo "Error: file not found" >&2; return 1; }
+    case $1 in
+        *.tar|*.tar.gz|*.tgz|*.tar.bz2|*.tar.xz) tar -xvf "$1" ;;
+        *.zip) _need unzip && unzip "$1" ;;
+        *.rar) _need unrar && unrar x "$1" ;;
+        *) echo "Unknown format" >&2; return 1 ;;
+    esac
+}
+
+pack() {
+    [ -z "$1" ] && { echo "Error: no output file specified" >&2; return 1; }
+    [ "$#" -lt 2 ] && { echo "Error: no input files specified" >&2; return 1; }
+
+    local output=$1
+    shift
+
+    case $output in
+        *.tar|*.tar.gz|*.tgz|*.tar.bz2|*.tar.xz) tar -cvaf "$output" "$@" ;;
+        *.zip) _need zip && zip -r "$output" "$@" ;;
+        *.rar) _need rar && rar a "$output" "$@" ;;
+        *) echo "Unknown format" >&2; return 1 ;;
+    esac
+}
+
+
+# Navigation
+mkcd() {
+    [ -z "$1" ] && { echo "Usage: mkcd <dir>"; return 1; }
+    mkdir -p -- "$1" && cd -- "$1"
+}
+
+up() {
+    local n="${1:-1}" dots="" i
+
+    [[ $n =~ ^-?[0-9]+$ ]] || {
+        echo "Usage: up <integer>" >&2
+        return 1
+    }
+
+    (( n < 1 )) && n=1
+    for (( i = 0; i < n; i++ )); do dots+="../"; done
+
+    cd "$dots" || return
+}
+alias ..='up 1'
+alias ...='up 2'
+alias ....='up 3'
+
+# tmpcd: make a throwaway temp dir and cd into it
+tmpcd() {
+    local d
+    d=$(mktemp -d) && cd -- "$d" || return
+    echo "$d"
+}
+
+
+### MODULES ###
+#
+# ~/.bashrc.d/*.sh
+
+# bash completion first so modules can register their own
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+for _rc in "$HOME"/.bashrc.d/*.sh; do
+    case ${_rc##*/} in starship.sh|tmux.sh) continue ;; esac
+    [ -r "$_rc" ] && . "$_rc"
+done
+
+# These two must run last!
+[ -r "$HOME/.bashrc.d/starship.sh" ] && . "$HOME/.bashrc.d/starship.sh"
+[ -r "$HOME/.bashrc.d/tmux.sh" ]     && . "$HOME/.bashrc.d/tmux.sh"
+unset _rc
