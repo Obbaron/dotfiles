@@ -4,7 +4,7 @@
 #
 # This module must load last!!
 
-have tmux || return 0
+_have tmux || return 0
 [ -z "${TMUX-}" ] || return 0
 
 tmux new-session -A -s default
