@@ -29,7 +29,7 @@ PS1='\[\e[32m\]\u\[\e[2;32m\]@\h\[\e[0m\]:\[\e[32m\]\w\[\e[0m\]\$ '
 export LANG="en_GB.UTF-8"
 export TZ="Europe/London"
 
-export EDITOR="vi"  # ~/.bashrc.d/editor.sh upgrades this
+export EDITOR="nvim"
 export VISUAL="$EDITOR"
 
 export GREP_COLORS='mt=1;36'
