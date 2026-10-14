@@ -1,6 +1,6 @@
 # ~/.bashrc.d/less.sh
 
-have less || return 0
+_have less || return 0
 
 export PAGER="less"
 export LESS="-R --mouse"
