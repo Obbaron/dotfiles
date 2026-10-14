@@ -1,23 +1,23 @@
 # ~/.bashrc.d/network.sh
 # network helpers
 
-if have wget; then
+if _have wget; then
     alias wget='wget -c'
 fi
 
 # public ip4 address
-if have curl; then
+if _have curl; then
     pubip() { curl -s https://icanhazip.com; }
-elif have wget; then
+elif _have wget; then
     pubip() { command wget -qO- https://icanhazip.com; }
 fi
 
 # tailscale ip
-if have tailscale; then
+if _have tailscale; then
     tsip() { tailscale ip -4; }
 fi
 
-if have ping; then
+if _have ping; then
     isup() {
         [ -z "$1" ] && { echo "Usage: isup <host>" >&2; return 1; }
 
@@ -30,7 +30,7 @@ if have ping; then
 fi
 
 # ports <filter>: listening sockets, optionally filtered
-if have ss; then
+if _have ss; then
     ports() {
         [ -n "$1" ] || { ss -tulnp; return; }
 
