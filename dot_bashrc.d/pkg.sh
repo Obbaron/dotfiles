@@ -23,8 +23,8 @@ detect_pkg_manager() (
 
     case $ID in
         arch|manjaro|endeavouros|cachyos)
-            if have paru; then echo paru
-            elif have yay; then echo yay
+            if _have paru; then echo paru
+            elif _have yay; then echo yay
             else echo pacman
             fi
             ;;
