@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# gut: delete everything inside a directory but keep the directory itself
+#
+# Usage: gut [-f|--force] <directory>
+#
+# Exit status: 0 gutted, 1 refused/cancelled/failed, 2 bad usage.
+
+set -u
+
+usage() { echo "Usage: gut [-f|--force] <directory>" >&2; }
+
+force=0
+dir=""
+
+for arg in "$@"; do
+    case $arg in
+        -h|--help)  usage; exit 0 ;;
+        -f|--force) force=1 ;;
+        -*)         echo "gut: unknown option: $arg" >&2; usage; exit 2 ;;
+        *)
+            [ -z "$dir" ] || { echo "gut: only one directory at a time" >&2; exit 2; }
+            dir=$arg
+            ;;
+    esac
+done
+
+[ -n "$dir" ] || { usage; exit 2; }
+[ -d "$dir" ] || { echo "gut: not a directory: $dir" >&2; exit 1; }
+
+# Resolve first so "/..", "/./" are caught
+dir=$(cd -- "$dir" && pwd -P) || exit 1
+if [[ $dir =~ ^/+$ ]]; then
+    echo "gut: refusing to gut the root directory" >&2
+    exit 1
+fi
+
+if (( ! force )); then
+    echo "About to delete ALL contents of: $dir"
+    read -r -p "Are you sure? (y/N): " confirm || confirm=""
+    case $confirm in
+        [yY]|[yY][eE][sS]) ;;
+        *) echo "Cancelled."; exit 1 ;;
+    esac
+fi
+
+if find "$dir" -mindepth 1 -delete; then
+    echo "Directory gutted: $dir"
+else
+    echo "gut: some items could not be deleted in $dir" >&2
+    exit 1
+fi
