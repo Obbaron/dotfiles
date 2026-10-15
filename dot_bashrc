@@ -33,18 +33,17 @@ _prompt() {
 }
 
 # _precmd: runs before each prompt. Appends history (shared across open shells
-# and tmux panes) and rebuilds the prompt with the exit code. ONE PROMPT_COMMAND
-# entry: two would clobber each other's $?.
+# and tmux panes) and rebuilds the prompt with the exit code.
 _precmd() {
     local rc=$?
     history -a
     declare -F _prompt >/dev/null && _prompt "$rc"
 }
 case ";${PROMPT_COMMAND-};" in
-    *";_precmd;"*) ;;                                      # already wired
+    *";_precmd;"*) ;;
     *) PROMPT_COMMAND="_precmd${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
 esac
-PROMPT_DIRTRIM=3            # collapse deep paths to .../last/three
+PROMPT_DIRTRIM=3
 
 
 ### ENVIRONMENT ###
@@ -52,13 +51,13 @@ PROMPT_DIRTRIM=3            # collapse deep paths to .../last/three
 export LANG="en_GB.UTF-8"
 export TZ="Europe/London"
 
-export EDITOR="vi"  # ~/.bashrc.d/editor.sh upgrades this
+export EDITOR="vim"  # ~/.bashrc.d/editor.sh upgrades this
 export VISUAL="$EDITOR"
 
 export GREP_COLORS='mt=1;36'
 
 # One source of file colours for ls, completion (colored-stats) and anything
-# that reads LS_COLORS. Picks up ~/.dircolors if present.
+# that reads LS_COLORS picks up ~/.dircolors
 if _have dircolors; then
     if [ -r "$HOME/.dircolors" ]; then eval "$(dircolors -b "$HOME/.dircolors")"
     else eval "$(dircolors -b)"
@@ -117,9 +116,8 @@ alias free='free -h'
 alias c='clear'
 alias q='exit'
 
-# trailing space: makes bash expand the NEXT word as an alias too, so
-# `sudo ll` and friends still resolve aliases
-alias sudo='sudo '
+
+alias sudo='sudo '  # trailing space makes bash expand next word as an alias too
 
 # spelling is hard
 alias suod='sudo'
@@ -140,15 +138,13 @@ path() {
     echo "$PATH" | tr ":" "\n" | nl
 }
 
-# modcheck: list every tool the modules guard with `_have`, and whether it is
-# installed. The list is read from the modules, so there's nothing to keep in
-# sync. Capability modules (clipboard, etc.) list each alternative separately.
+# list every tool module with `_have` guard and check its installed
 modcheck() {
     local t
     for t in $(grep -ho '\b_have [A-Za-z0-9._-]\+' "$HOME"/.bashrc.d/*.sh 2>/dev/null \
                | cut -d' ' -f2 | sort -u); do
         if _have "$t"; then printf '  \e[32mok     \e[0m %s\n' "$t"
-        else              printf '  \e[31mmissing\e[0m %s\n' "$t"
+        else printf '  \e[31mmissing\e[0m %s\n' "$t"
         fi
     done
 }
@@ -173,8 +169,7 @@ backup() {
     cp -- "$1" "$1.$(date +%Y%m%d%H%M%S).bak"
 }
 
-# restore <file>: copy the newest backup made by backup() over <file>.
-# The timestamp in the name is zero-padded, so the glob's last match is newest.
+# restore <file>: copy the newest backup made by backup() over <file>
 restore() {
     [ -z "$1" ] && { echo "Usage: restore <file>"; return 1; }
     local target=$1 backups confirm
