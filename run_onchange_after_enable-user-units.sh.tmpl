@@ -4,6 +4,6 @@
 # throw: {{ include "dot_config/systemd/user/throw.service" | sha256sum }} {{ include "dot_local/lib/throw/executable_throw.py" | sha256sum }}
 systemctl --user daemon-reload
 systemctl --user enable --now keepalive.timer
-systemctl --user enable throw.service
-systemctl --user restart throw.service
+#systemctl --user enable throw.service
+#systemctl --user restart throw.service
 {{ end -}}
