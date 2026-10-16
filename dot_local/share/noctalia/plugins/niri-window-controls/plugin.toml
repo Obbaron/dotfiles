@@ -1,0 +1,44 @@
+id = "bnb/niri-window-controls"
+name = "Niri Window Controls"
+version = "1.0.0"
+author = "bnb"
+min_noctalia = "5.0.0"
+description = "Clickable close (labelled with the focused window title), maximize, and fullscreen buttons for niri."
+icon = "close"
+tags = ["niri", "window", "controls"]
+
+[[widget]]
+id = "close"
+entry = "close.luau"
+
+[[widget.setting]]
+key = "glyph"
+type = "string"
+label = "Icon"
+default = "close"
+
+[[widget.setting]]
+key = "max_length"
+type = "int"
+label = "Max title length"
+default = 40
+
+[[widget]]
+id = "maximize"
+entry = "maximize.luau"
+
+[[widget.setting]]
+key = "glyph"
+type = "string"
+label = "Icon"
+default = "crop_square"
+
+[[widget]]
+id = "fullscreen"
+entry = "fullscreen.luau"
+
+[[widget.setting]]
+key = "glyph"
+type = "string"
+label = "Icon"
+default = "fullscreen"
