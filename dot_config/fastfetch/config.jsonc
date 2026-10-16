@@ -1,0 +1,40 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+
+    // Built-in small logo (no external logo.txt needed).
+    // Swap "arch_small" for any distro + "_small", e.g. "nixos_small", "debian_small".
+    // Run `fastfetch --list-logos` to see them all.
+    "logo": {
+        "type": "builtin",
+        "source": "arch_small",
+        "padding": { "top": 1, "right": 3 }
+    },
+
+    "display": {
+        "key": { "width": 15 },   // pads every key to 15 cols so the right bar lines up
+        "separator": "│  ",       // right edge of the box + gap before the value
+        "color": { "keys": "magenta" }
+    },
+
+    "modules": [
+        { "type": "custom", "format": "╭──────────────╮", "outputColor": "magenta" },
+
+        { "type": "title",    "key": "│    user   ",  "format": "{user-name}" },
+        { "type": "title",    "key": "│    hname  ",  "format": "{host-name}" },
+        { "type": "uptime",   "key": "│    uptime " },
+        { "type": "os",       "key": "│    distro ",  "format": "{name} {arch}" },
+        { "type": "kernel",   "key": "│    kernel " },
+        { "type": "terminal", "key": "│    term   " },
+        { "type": "shell",    "key": "│    shell  " },
+        { "type": "cpu",      "key": "│    cpu    " },
+        { "type": "disk",     "key": "│    disk   ",  "folders": "/" },
+        { "type": "memory",   "key": "│    memory " },
+        { "type": "localip",  "key": "│    network",  "showIpv6": false, "showMac": false },
+
+        { "type": "custom", "format": "│              │", "outputColor": "magenta" },
+
+        { "type": "colors", "key": "│    colors ", "symbol": "circle", "block": { "range": [0, 7] } },
+
+        { "type": "custom", "format": "╰──────────────╯", "outputColor": "magenta" }
+    ]
+}
