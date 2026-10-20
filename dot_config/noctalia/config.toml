@@ -7,7 +7,7 @@ ui_scale = 1.6500000171363354
 enable_sounds = true
 
 [bar.default]
-capsule = true
+capsule = false
 center = [ "clock", "weather" ]
 contact_shadow = true
 end = [ "tray", "notifications", "network", "bluetooth", "volume", "session" ]
