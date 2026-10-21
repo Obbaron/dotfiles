@@ -1,0 +1,30 @@
+// ────────────── Miscellaneous ──────────────
+// https://github.com/YaLTeR/niri/wiki/Configuration:-Miscellaneous
+
+prefer-no-csd
+
+screenshot-path "~/Pictures/screenshots/screenshots%Y-%m-%d %H-%M-%S.png"
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+environment {
+    XDG_CURRENT_DESKTOP "niri"
+
+    // Electron apps: use on wayland, not xwayland
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
+
+    // Qt apps: prefer Wayland, fall back to XWayland
+    QT_QPA_PLATFORM "wayland;xcb"
+    QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
+
+    // Theme Qt apps to match GTK (needs a platformtheme plugin
+    // installed or Qt apps may warn)
+    // QT_QPA_PLATFORMTHEME "gtk3"
+}
+
+// Lets noctalia trigger notifications et al.
+debug {
+    honor-xdg-activation-with-invalid-serial
+}

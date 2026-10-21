@@ -1,0 +1,26 @@
+// ────────────── Window Rules ──────────────
+// https://github.com/YaLTeR/niri/wiki/Configuration:-Window-Rules
+
+window-rule {
+    geometry-corner-radius 12
+    clip-to-geometry true
+}
+
+// Firefox picture-in-picture floats by default
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+// WezTerm initial-configure workaround
+window-rule {
+    match app-id=r#"^org\.wezfurlong\.wezterm$"#
+    default-column-width {}
+}
+
+// Place the noctalia wallpaper into backdrop (needs layout
+// background-color "transparent")
+layer-rule {
+    match namespace="^noctalia-wallpaper*"
+    place-within-backdrop true
+}

@@ -1,0 +1,30 @@
+// ────────────── Input Configuration ──────────────
+// https://github.com/YaLTeR/niri/wiki/Configuration:-Input
+
+input {
+    keyboard {
+        xkb {
+            // Empty: niri inherits xkb settings from org.freedesktop.locale1.
+            // Set layout/variant/options here to override.
+        }
+        numlock
+    }
+
+    touchpad {
+        tap
+        scroll-factor 0.5
+        natural-scroll
+    }
+
+    mouse {
+        natural-scroll
+        scroll-factor 0.5
+    }
+
+    // Focus windows/outputs under the mouse.
+    // max-scroll-amount="0%" would restrict it to windows already fully on screen.
+    focus-follows-mouse max-scroll-amount="100%"
+
+    // Switching to the current workspace again returns to the previous one.
+    workspace-auto-back-and-forth
+}
