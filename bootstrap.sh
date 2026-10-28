@@ -18,12 +18,11 @@ set -eu
 
 REPO="${REPO:-Obbaron/dotfiles}"
 REPO_URL="${REPO_URL:-https://github.com/$REPO.git}"
-DRY_RUN="${DRY_RUN:-}"
 
 BASHRC_URL="https://raw.githubusercontent.com/$REPO/main/dot_bashrc"
 BASHRC="${HOME:?HOME must be set}/.bashrc"
 
-ESC=$(printf '\033')
+DRY_RUN="${DRY_RUN:-}"
 
 log() {
     lvl="$1"
@@ -33,16 +32,15 @@ log() {
 
     if [ -z "${NO_COLOR:-}" ] && [ -t 2 ]; then
         case "$lvl" in
-            debug) color="${ESC}[2m"  ;;
-            info)  color="${ESC}[36m" ;;
-            warn)  color="${ESC}[33m" ;;
-            error) color="${ESC}[31m" ;;
+            debug) color="$(printf '\033')[2m"  ;;
+            info)  color="$(printf '\033')[36m" ;;
+            warn)  color="$(printf '\033')[33m" ;;
+            error) color="$(printf '\033')[31m" ;;
         esac
-        reset="${ESC}[0m"
+        reset="$(printf '\033')[0m"
     fi
 
-    printf '[install] %s%-5s%s %s\n' \
-        "$color" "$lvl" "$reset" "$*" >&2
+    printf '[install] %s%-5s%s %s\n' "$color" "$lvl" "$reset" "$*" >&2
 }
 say() {
     log info "$@"
@@ -140,19 +138,35 @@ main() {
         need="$need curl"
     fi
 
-    # bashrc
+    # .bashrc
     if [ -n "$DRY_RUN" ]; then
         say "would download $BASHRC_URL to $BASHRC"
         say "would source $BASHRC"
     else
+        if [ -f "$BASHRC" ] && [ -e "$BASHRC.bak" ]; then
+            die "both $BASHRC and $BASHRC.bak exist; please clean them up before continuing"
+        fi
+
         BASHRC_TMP=$(mktemp /tmp/bashrc.bootstrap.XXXXXX) \
             || die "failed to create temporary file"
 
         say "downloading .bashrc from $BASHRC_URL"
 
         if curl -fsSL "$BASHRC_URL" -o "$BASHRC_TMP"; then
+            if [ -f "$BASHRC" ]; then
+                say "backing up existing .bashrc"
+                cp -p "$BASHRC" "$BASHRC.bak" \
+                    || {
+                        rm -f "$BASHRC_TMP"
+                        die "failed to back up existing $BASHRC"
+                    }
+            fi
+
             mv "$BASHRC_TMP" "$BASHRC" \
-                || die "failed to install $BASHRC"
+                || {
+                    rm -f "$BASHRC_TMP"
+                    die "failed to install $BASHRC"
+                }
 
             say "installed $BASHRC"
         else
@@ -183,8 +197,7 @@ main() {
         return 0
     fi
 
-    exec sh -c "$(curl -fsLS https://get.chezmoi.io)" -- \
-        init --apply "$REPO_URL"
+    exec sh -c "$(curl -fsLS https://get.chezmoi.io)" -- init --apply "$REPO_URL"
 }
 
 main "$@"
