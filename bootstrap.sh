@@ -24,6 +24,17 @@ BASHRC="${HOME:?HOME must be set}/.bashrc"
 
 DRY_RUN="${DRY_RUN:-}"
 
+BASHRC_TMP=
+cleanup() {
+    if [ -n "$BASHRC_TMP" ]; then
+        tmp=$BASHRC_TMP
+        BASHRC_TMP=
+        rm -f "$tmp"
+    fi
+}
+trap cleanup 0
+trap 'exit 1' HUP INT TERM
+
 ESC=$(printf '\033')
 log() {
     lvl="$1"
@@ -151,15 +162,14 @@ main() {
     fi
 
     # .bashrc
+    if [ -e "$BASHRC.bak" ] || [ -L "$BASHRC.bak" ]; then
+        die "$BASHRC.bak already exists; remove it and try again"
+    fi
+
     if [ -n "$DRY_RUN" ]; then
         say "would download $BASHRC_URL to $BASHRC"
-        say "would source $BASHRC"
     else
-        if [ -f "$BASHRC" ] && [ -e "$BASHRC.bak" ]; then
-            die "both $BASHRC and $BASHRC.bak exist; please clean them up before continuing"
-        fi
-
-        BASHRC_TMP=$(mktemp /tmp/bashrc.bootstrap.XXXXXX) \
+        BASHRC_TMP=$(mktemp "${BASHRC}.tmp.XXXXXX") \
             || die "failed to create temporary file"
 
         say "downloading .bashrc from $BASHRC_URL"
@@ -168,37 +178,49 @@ main() {
             if [ -f "$BASHRC" ]; then
                 say "backing up existing .bashrc"
                 cp -p "$BASHRC" "$BASHRC.bak" \
-                    || {
-                        rm -f "$BASHRC_TMP"
-                        die "failed to back up existing $BASHRC"
-                    }
+                    || die "failed to back up existing $BASHRC"
             fi
 
             mv "$BASHRC_TMP" "$BASHRC" \
-                || {
-                    rm -f "$BASHRC_TMP"
-                    die "failed to install $BASHRC"
-                }
+                || die "failed to install $BASHRC"
 
+            BASHRC_TMP=
             say "installed $BASHRC"
         else
-            rm -f "$BASHRC_TMP"
             die "failed to download .bashrc from $BASHRC_URL"
         fi
-
-        say "sourcing $BASHRC"
-        . "$BASHRC"
     fi
 
     # Chezmoi
+    if command -v chezmoi >/dev/null 2>&1; then
+        say "chezmoi already installed: $(chezmoi --version)"
+
+        if chezmoi source-path >/dev/null 2>&1; then
+            say "chezmoi already initialized"
+            return 0
+        fi
+
+        say "chezmoi installed but not initialized"
+        if [ -n "$DRY_RUN" ]; then
+            say "would initialize and apply $REPO_URL"
+            return 0
+        fi
+
+        exec chezmoi init --apply "$REPO_URL"
+    fi
+
     say "installing chezmoi and applying dotfiles from $REPO_URL"
 
     if [ -n "$DRY_RUN" ]; then
-        say "+ sh -c \"\$(curl -fsLS https://get.chezmoi.io)\" -- init --apply $REPO_URL"
+        say "would download and run chezmoi installer"
+        say "would initialize and apply $REPO_URL"
         return 0
     fi
 
-    exec sh -c "$(curl -fsLS https://get.chezmoi.io)" -- init --apply "$REPO_URL"
+    CHEZMOI_INSTALLER=$(curl -fsSL https://get.chezmoi.io) \
+        || die "failed to download chezmoi installer"
+
+    exec sh -c "$CHEZMOI_INSTALLER" -- init --apply "$REPO_URL"
 }
 
 main "$@"
