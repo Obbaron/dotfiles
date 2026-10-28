@@ -24,6 +24,7 @@ BASHRC="${HOME:?HOME must be set}/.bashrc"
 
 DRY_RUN="${DRY_RUN:-}"
 
+ESC=$(printf '\033')
 log() {
     lvl="$1"
     color=""
@@ -32,12 +33,12 @@ log() {
 
     if [ -z "${NO_COLOR:-}" ] && [ -t 2 ]; then
         case "$lvl" in
-            debug) color="$(printf '\033')[2m"  ;;
-            info)  color="$(printf '\033')[36m" ;;
-            warn)  color="$(printf '\033')[33m" ;;
-            error) color="$(printf '\033')[31m" ;;
+            debug) color="${ESC}[2m"  ;;
+            info)  color="${ESC}[36m" ;;
+            warn)  color="${ESC}[33m" ;;
+            error) color="${ESC}[31m" ;;
         esac
-        reset="$(printf '\033')[0m"
+        reset="${ESC}[0m"
     fi
 
     printf '[install] %s%-5s%s %s\n' "$color" "$lvl" "$reset" "$*" >&2
@@ -138,6 +139,17 @@ main() {
         need="$need curl"
     fi
 
+    # shellcheck disable=SC2086
+    [ -z "$need" ] || install_pkgs $need
+
+    if [ -z "$DRY_RUN" ]; then
+        command -v git >/dev/null 2>&1 \
+            || die "git still unavailable after installation"
+
+        command -v curl >/dev/null 2>&1 \
+            || die "curl still unavailable after installation"
+    fi
+
     # .bashrc
     if [ -n "$DRY_RUN" ]; then
         say "would download $BASHRC_URL to $BASHRC"
@@ -176,17 +188,6 @@ main() {
 
         say "sourcing $BASHRC"
         . "$BASHRC"
-    fi
-
-    # shellcheck disable=SC2086
-    [ -z "$need" ] || install_pkgs $need
-
-    if [ -z "$DRY_RUN" ]; then
-        command -v git >/dev/null 2>&1 \
-            || die "git still unavailable after installation"
-
-        command -v curl >/dev/null 2>&1 \
-            || die "curl still unavailable after installation"
     fi
 
     # Chezmoi
