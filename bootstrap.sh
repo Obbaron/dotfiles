@@ -20,6 +20,9 @@ REPO="${REPO:-Obbaron/dotfiles}"
 REPO_URL="${REPO_URL:-https://github.com/$REPO.git}"
 DRY_RUN="${DRY_RUN:-}"
 
+BASHRC_URL="https://raw.githubusercontent.com/$REPO/main/dot_bashrc"
+BASHRC="${HOME:?HOME must be set}/.bashrc"
+
 ESC=$(printf '\033')
 
 log() {
@@ -135,6 +138,30 @@ main() {
     else
         say "curl not found; will install curl"
         need="$need curl"
+    fi
+
+    # bashrc
+    if [ -n "$DRY_RUN" ]; then
+        say "would download $BASHRC_URL to $BASHRC"
+        say "would source $BASHRC"
+    else
+        BASHRC_TMP=$(mktemp /tmp/bashrc.bootstrap.XXXXXX) \
+            || die "failed to create temporary file"
+
+        say "downloading .bashrc from $BASHRC_URL"
+
+        if curl -fsSL "$BASHRC_URL" -o "$BASHRC_TMP"; then
+            mv "$BASHRC_TMP" "$BASHRC" \
+                || die "failed to install $BASHRC"
+
+            say "installed $BASHRC"
+        else
+            rm -f "$BASHRC_TMP"
+            die "failed to download .bashrc from $BASHRC_URL"
+        fi
+
+        say "sourcing $BASHRC"
+        . "$BASHRC"
     fi
 
     # shellcheck disable=SC2086
