@@ -1,8 +1,8 @@
 #!/bin/sh
-# install.sh
+# bootstrap.sh
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/Obbaron/dotfiles-et-al/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/Obbaron/dotfiles/main/bootstrap.sh | sh
 #
 # Config:
 #   REPO       owner/name
@@ -10,9 +10,9 @@
 #   DRY_RUN    report actions but change nothing
 #
 # Examples:
-#   ./install.sh
-#   REPO_URL=git@github.com:Obbaron/dotfiles-et-al.git ./install.sh
-#   DRY_RUN=1 ./install.sh
+#   ./bootstrap.sh
+#   REPO_URL=git@github.com:Obbaron/dotfiles.git ./bootstrap.sh
+#   DRY_RUN=1 ./bootstrap.sh
 
 set -eu
 
