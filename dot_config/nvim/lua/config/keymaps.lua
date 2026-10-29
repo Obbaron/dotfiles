@@ -36,3 +36,23 @@ vim.keymap.set("n", "<leader>n", "<cmd>ene | startinsert<CR>", { desc = "New buf
 vim.keymap.set("n", "<leader>x", "<cmd>bdelete<CR>", { desc = "Close buffer" })
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
 vim.keymap.set("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+
+
+-- Toggle automatic LSP completion
+vim.keymap.set("n", "<leader>ta", function()
+    vim.g.lsp_auto_completion = vim.g.lsp_auto_completion == false
+
+    for _, client in ipairs(vim.lsp.get_clients()) do
+        if client:supports_method("textDocument/completion") then
+            for _, bufnr in ipairs(vim.lsp.get_buffers_by_client_id(client.id)) do
+                vim.lsp.completion.enable(true, client.id, bufnr, {
+                    autotrigger = vim.g.lsp_auto_completion,
+                })
+            end
+        end
+    end
+
+    vim.notify("Automatic LSP completion " ..
+        (vim.g.lsp_auto_completion and "enabled" or "disabled"))
+end, { desc = "Toggle automatic LSP completion" })
+
