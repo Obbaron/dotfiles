@@ -62,3 +62,6 @@ vim.opt.listchars = {
     trail = "·",
     nbsp = "␣",
 }
+
+-- LSP
+vim.g.lsp_auto_completion = true
